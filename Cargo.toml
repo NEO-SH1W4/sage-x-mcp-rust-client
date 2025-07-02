@@ -13,10 +13,6 @@ categories = ["api-bindings", "development-tools", "wasm"]
 name = "sage_x_mcp_client"
 path = "src/lib.rs"
 
-[[bin]]
-name = "sage-x-mcp-demo"
-path = "src/bin/demo.rs"
-
 [dependencies]
 # Async runtime
 tokio = { version = "1.36", features = ["full", "rt-multi-thread", "macros", "time", "fs", "process"] }
@@ -43,7 +39,7 @@ anyhow = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 log = "0.4"
 env_logger = "0.10"
-clap = { version = "4.0", features = ["derive"] }
+clap = { version = "4.4", features = ["derive"], optional = true }
 
 # Cryptography & Security
 sha2 = "0.10"
@@ -85,10 +81,6 @@ wasm-support = ["wasm-bindgen", "wasm-bindgen-futures", "js-sys"]
 
 # Development features
 dev-tools = ["clap"]
-
-[[bench]]
-name = "mcp_client_bench"
-harness = false
 
 [profile.release]
 lto = true

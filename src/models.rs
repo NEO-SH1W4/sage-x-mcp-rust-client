@@ -779,7 +779,7 @@ impl SageXRule {
     }
 
     /// Aplica a regra no contexto fornecido
-    pub async fn apply(&mut self, context: &SessionContext) -> SageXResult<ExecutionResult> {
+    pub async fn apply(&mut self, _context: &SessionContext) -> SageXResult<ExecutionResult> {
         let start_time = SystemTime::now();
         
         // Simular aplicação da regra

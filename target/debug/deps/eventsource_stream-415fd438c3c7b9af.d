@@ -1,0 +1,10 @@
+C:\Users\João\Desktop\PROJETOS\sage-x-mcp-rust-client\target\debug\deps\libeventsource_stream-415fd438c3c7b9af.rmeta: C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\lib.rs C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\event.rs C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\event_stream.rs C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\parser.rs C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\traits.rs C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\utf8_stream.rs
+
+C:\Users\João\Desktop\PROJETOS\sage-x-mcp-rust-client\target\debug\deps\eventsource_stream-415fd438c3c7b9af.d: C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\lib.rs C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\event.rs C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\event_stream.rs C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\parser.rs C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\traits.rs C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\utf8_stream.rs
+
+C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\lib.rs:
+C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\event.rs:
+C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\event_stream.rs:
+C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\parser.rs:
+C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\traits.rs:
+C:\Users\João\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\eventsource-stream-0.2.3\src\utf8_stream.rs:

@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime};
 
-use reqwest::{Client as HttpClient, header::{HeaderMap, HeaderValue, AUTHORIZATION, USER_AGENT}};
+use reqwest::{Client as HttpClient, header::{HeaderMap, HeaderValue, HeaderName, AUTHORIZATION, USER_AGENT}};
 use serde_json::Value;
 use tokio::sync::{RwLock, mpsc};
 use uuid::Uuid;
@@ -14,8 +14,8 @@ use uuid::Uuid;
 use crate::error::{SageXError, SageXResult};
 use crate::models::{
     SageXConfig, SageXRule, DevSession, SessionContext, SessionState,
-    McpRequest, McpResponse, McpError, McpTool, McpResource,
-    ExecutionResult, UnixTimestamp
+    McpRequest, McpResponse, McpTool, McpResource,
+    ExecutionResult
 };
 
 /// Cliente principal SAGE-X MCP
@@ -194,12 +194,11 @@ impl SageXClient {
 
         // Headers customizados
         for (key, value) in &config.network.custom_headers {
-            headers.insert(
-                key.parse()
-                    .map_err(|e| SageXError::configuration(format!("Header inválido '{}': {}", key, e)))?,
-                HeaderValue::from_str(value)
-                    .map_err(|e| SageXError::configuration(format!("Valor de header inválido '{}': {}", value, e)))?
-            );
+            let header_name: HeaderName = key.parse()
+                .map_err(|e| SageXError::configuration(format!("Header inválido '{}': {}", key, e)))?;
+            let header_value = HeaderValue::from_str(value)
+                .map_err(|e| SageXError::configuration(format!("Valor de header inválido '{}': {}", value, e)))?;
+            headers.insert(header_name, header_value);
         }
 
         let client = HttpClient::builder()
@@ -303,8 +302,8 @@ impl SageXClient {
             .map_err(|e| SageXError::connection(format!("Falha ao conectar: {}", e)))?;
 
         if !response.status().is_success() {
-            return Err(SageXError::http(
-                reqwest::Error::from(response.error_for_status().unwrap_err())
+            return Err(SageXError::Http(
+                response.error_for_status().unwrap_err().to_string()
             ));
         }
 
@@ -434,7 +433,7 @@ impl SageXClient {
             .unwrap()
             .as_secs();
 
-        let request = McpRequest {
+        let _request = McpRequest {
             id: request_id.clone(),
             method: format!("tools/{}", tool_name),
             params: Some(params),
@@ -482,8 +481,8 @@ impl SageXClient {
             .map_err(|e| SageXError::connection(format!("Falha ao obter resource: {}", e)))?;
 
         if !response.status().is_success() {
-            return Err(SageXError::http(
-                reqwest::Error::from(response.error_for_status().unwrap_err())
+            return Err(SageXError::Http(
+                response.error_for_status().unwrap_err().to_string()
             ));
         }
 

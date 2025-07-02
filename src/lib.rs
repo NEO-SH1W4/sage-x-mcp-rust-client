@@ -56,24 +56,25 @@
 
 pub mod client;
 pub mod error;
-pub mod mcp;
+// pub mod mcp;
+// pub mod rules;
+// pub mod sync;
 pub mod models;
-pub mod rules;
-pub mod sync;
 
 // Re-exportações públicas principais
-pub use client::{ClientConfig, SageXMcpClient};
+pub use client::{SageXClient, SageXClientBuilder, SageXEvent};
 pub use error::{SageXError, SageXResult};
 pub use models::{
-    AgentContext, Credentials, McpMessage, McpRequest, McpResponse, Rule, RuleResult, Token,
+    SageXConfig, SessionContext, McpRequest, McpResponse, McpTool, McpResource,
+    SageXRule, DevSession, ExecutionResult,
 };
 
 // Re-exportações condicionais por features
-#[cfg(feature = "python-bridge")]
-pub use mcp::bridge::PythonBridge;
+// #[cfg(feature = "python-bridge")]
+// pub use mcp::bridge::PythonBridge;
 
-#[cfg(feature = "wasm-support")]
-pub use mcp::wasm::WasmBridge;
+// #[cfg(feature = "wasm-support")]
+// pub use mcp::wasm::WasmBridge;
 
 /// Versão da biblioteca
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -93,28 +94,17 @@ pub const USER_AGENT: &str = concat!(
 );
 
 /// Configuração padrão para desenvolvimento
-pub fn default_dev_config() -> ClientConfig {
-    ClientConfig::builder()
-        .api_url("http://localhost:8001")
-        .use_sse(true)
-        .cache_enabled(true)
-        .timeout_seconds(30)
-        .retry_attempts(3)
-        .build()
-        .expect("Configuração padrão deve ser válida")
+pub fn default_dev_config() -> SageXConfig {
+    let mut config = SageXConfig::default();
+    config.api_base_url = "http://localhost:8001".to_string();
+    config
 }
 
 /// Configuração padrão para produção
-pub fn default_prod_config() -> ClientConfig {
-    ClientConfig::builder()
-        .api_url("https://api.sage-x.ai")
-        .use_sse(true)
-        .cache_enabled(true)
-        .timeout_seconds(60)
-        .retry_attempts(5)
-        .connection_pool_size(10)
-        .build()
-        .expect("Configuração padrão deve ser válida")
+pub fn default_prod_config() -> SageXConfig {
+    let mut config = SageXConfig::default();
+    config.api_base_url = "https://api.sage-x.ai".to_string();
+    config
 }
 
 /// Utilitário para logging configurado
@@ -125,40 +115,23 @@ pub fn init_logging(level: log::LevelFilter) {
         .init();
 }
 
-/// Macro para criar um contexto de agente rapidamente
+/// Macro para criar configuração de cliente rapidamente
 #[macro_export]
-macro_rules! agent_context {
-    ($id:expr, $name:expr) => {
-        $crate::AgentContext::new($id.to_string(), $name.to_string())
-    };
-    ($id:expr, $name:expr, $($key:expr => $value:expr),+ $(,)?) => {{
-        let mut context = $crate::AgentContext::new($id.to_string(), $name.to_string());
-        $(
-            context.set_state($key, $value);
-        )+
-        context
-    }};
-}
-
-/// Macro para configuração rápida do cliente
-#[macro_export]
-macro_rules! sage_client {
+macro_rules! sage_config {
     ($api_url:expr) => {
-        $crate::SageXMcpClient::new(
-            $crate::ClientConfig::builder()
-                .api_url($api_url)
-                .build()
-                .expect("Configuração deve ser válida")
-        )
+        {
+            let mut config = $crate::SageXConfig::default();
+            config.api_base_url = $api_url.to_string();
+            config
+        }
     };
-    ($api_url:expr, $client_id:expr, $client_secret:expr) => {
-        $crate::SageXMcpClient::new(
-            $crate::ClientConfig::builder()
-                .api_url($api_url)
-                .credentials($crate::Credentials::new($client_id, $client_secret))
-                .build()
-                .expect("Configuração deve ser válida")
-        )
+    ($api_url:expr, $token:expr) => {
+        {
+            let mut config = $crate::SageXConfig::default();
+            config.api_base_url = $api_url.to_string();
+            config.auth_token = $token.to_string();
+            config
+        }
     };
 }
 
@@ -177,42 +150,23 @@ mod tests {
     #[test]
     fn test_default_configs() {
         let dev_config = default_dev_config();
-        assert_eq!(dev_config.api_url(), "http://localhost:8001");
-        assert!(dev_config.use_sse());
+        assert_eq!(dev_config.api_base_url, "http://localhost:8001");
 
         let prod_config = default_prod_config();
-        assert_eq!(prod_config.api_url(), "https://api.sage-x.ai");
-        assert!(prod_config.use_sse());
+        assert_eq!(prod_config.api_base_url, "https://api.sage-x.ai");
     }
 
     #[test]
-    fn test_agent_context_macro() {
-        let context = agent_context!("test_id", "Test Agent");
-        assert_eq!(context.agent_id(), "test_id");
-        assert_eq!(context.agent_name(), "Test Agent");
+    fn test_sage_config_macro() {
+        let config = sage_config!("http://localhost:8001");
+        assert_eq!(config.api_base_url, "http://localhost:8001");
 
-        let context_with_state = agent_context!(
-            "test_id", 
-            "Test Agent",
-            "key1" => serde_json::json!("value1"),
-            "key2" => serde_json::json!(42)
-        );
-        assert_eq!(context_with_state.agent_id(), "test_id");
-        assert!(context_with_state.get_state("key1").is_some());
-        assert!(context_with_state.get_state("key2").is_some());
-    }
-
-    #[test]
-    fn test_sage_client_macro() {
-        let client = sage_client!("http://localhost:8001");
-        assert_eq!(client.config().api_url(), "http://localhost:8001");
-
-        let client_with_creds = sage_client!(
+        let config_with_token = sage_config!(
             "http://localhost:8001", 
-            "test_client", 
-            "test_secret"
+            "test_token"
         );
-        assert!(client_with_creds.config().credentials().is_some());
+        assert_eq!(config_with_token.api_base_url, "http://localhost:8001");
+        assert_eq!(config_with_token.auth_token, "test_token");
     }
 }
 

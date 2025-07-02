@@ -11,7 +11,7 @@ use thiserror::Error;
 pub type SageXResult<T> = Result<T, SageXError>;
 
 /// Erros específicos do SAGE-X MCP Client
-#[derive(Error, Debug)]
+#[derive(Error, Debug, Clone)]
 pub enum SageXError {
     /// Erro de autenticação ou autorização
     #[error("Erro de autenticação: {message}")]
@@ -61,23 +61,23 @@ pub enum SageXError {
 
     /// Erro de I/O
     #[error("Erro de I/O: {0}")]
-    Io(#[from] std::io::Error),
+    Io(String),
 
     /// Erro HTTP
     #[error("Erro HTTP: {0}")]
-    Http(#[from] reqwest::Error),
+    Http(String),
 
     /// Erro JSON
     #[error("Erro JSON: {0}")]
-    Json(#[from] serde_json::Error),
+    Json(String),
 
     /// Erro JWT
     #[error("Erro JWT: {0}")]
-    Jwt(#[from] jsonwebtoken::errors::Error),
+    Jwt(String),
 
     /// Erro genérico
     #[error("Erro interno: {0}")]
-    Internal(#[from] anyhow::Error),
+    Internal(String),
 
     /// Erro desconhecido
     #[error("Erro desconhecido: {message}")]
@@ -335,6 +335,37 @@ macro_rules! sage_error {
     ($msg:expr) => {
         $crate::SageXError::unknown($msg)
     };
+}
+
+// Implementações From para conversão automática de erros de terceiros
+impl From<std::io::Error> for SageXError {
+    fn from(err: std::io::Error) -> Self {
+        Self::Io(err.to_string())
+    }
+}
+
+impl From<reqwest::Error> for SageXError {
+    fn from(err: reqwest::Error) -> Self {
+        Self::Http(err.to_string())
+    }
+}
+
+impl From<serde_json::Error> for SageXError {
+    fn from(err: serde_json::Error) -> Self {
+        Self::Json(err.to_string())
+    }
+}
+
+impl From<jsonwebtoken::errors::Error> for SageXError {
+    fn from(err: jsonwebtoken::errors::Error) -> Self {
+        Self::Jwt(err.to_string())
+    }
+}
+
+impl From<anyhow::Error> for SageXError {
+    fn from(err: anyhow::Error) -> Self {
+        Self::Internal(err.to_string())
+    }
 }
 
 #[cfg(test)]
