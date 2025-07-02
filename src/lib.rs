@@ -14,30 +14,39 @@
 //! ## Quick Start
 //!
 //! ```rust
-//! use sage_x_mcp_client::{SageXMcpClient, ClientConfig, Credentials};
+//! use sage_x_mcp_client::{SageXClient, SageXConfig, SessionContext};
+//! use std::collections::HashMap;
 //!
 //! # async fn example() -> Result<(), Box<dyn std::error::Error>> {
 //! // Configuração do cliente
-//! let config = ClientConfig::builder()
-//!     .api_url("http://localhost:8001")
-//!     .credentials(Credentials::new("sage_x_agent", "agent_secret"))
-//!     .use_sse(true)
-//!     .cache_enabled(true)
-//!     .build()?;
+//! let config = SageXConfig {
+//!     api_base_url: "http://localhost:8001".to_string(),
+//!     auth_token: "your_token".to_string(),
+//!     ..Default::default()
+//! };
 //!
 //! // Inicialização do cliente
-//! let mut client = SageXMcpClient::new(config);
-//! client.init().await?;
+//! let client = SageXClient::with_config(config).await?;
 //!
-//! // Criar contexto do agente
-//! let mut context = client.create_agent_context("sage_x_001", "SAGE-X Agent")?;
+//! // Criar contexto de sessão
+//! let context = SessionContext {
+//!     working_directory: "/workspace".to_string(),
+//!     project_name: Some("my-project".to_string()),
+//!     git_branch: Some("main".to_string()),
+//!     technologies: vec!["rust".to_string()],
+//!     environment: HashMap::new(),
+//!     editor_config: HashMap::new(),
+//! };
 //!
-//! // Buscar e aplicar regras
-//! let rules = client.fetch_rules().await?;
-//! let results = client.apply_rules(&mut context).await?;
+//! // Iniciar sessão
+//! let session_id = client.start_session(context).await?;
 //!
-//! // Enviar resultados de volta
-//! client.send_results(&context).await?;
+//! // Aplicar regras automaticamente
+//! let results = client.apply_applicable_rules().await?;
+//! println!("Aplicadas {} regras", results.len());
+//!
+//! // Finalizar sessão
+//! client.end_session().await?;
 //! # Ok(())
 //! # }
 //! ```
@@ -56,7 +65,7 @@
 
 pub mod client;
 pub mod error;
-// pub mod mcp;
+pub mod mcp;
 // pub mod rules;
 // pub mod sync;
 pub mod models;

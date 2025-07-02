@@ -15,31 +15,54 @@ pub type SageXResult<T> = Result<T, SageXError>;
 pub enum SageXError {
     /// Erro de autenticação ou autorização
     #[error("Erro de autenticação: {message}")]
-    Authentication { message: String },
+    Authentication { 
+        /// Mensagem de erro
+        message: String 
+    },
 
     /// Erro de conexão de rede
     #[error("Erro de conexão: {message}")]
-    Connection { message: String },
+    Connection { 
+        /// Mensagem de erro
+        message: String 
+    },
 
     /// Erro ao processar regras
     #[error("Erro ao processar regra '{rule_id}': {message}")]
-    RuleProcessing { rule_id: String, message: String },
+    RuleProcessing { 
+        /// ID da regra que causou erro
+        rule_id: String, 
+        /// Mensagem de erro
+        message: String 
+    },
 
     /// Erro de cache
     #[error("Erro de cache: {message}")]
-    Cache { message: String },
+    Cache { 
+        /// Mensagem de erro
+        message: String 
+    },
 
     /// Erro de configuração
     #[error("Erro de configuração: {message}")]
-    Configuration { message: String },
+    Configuration { 
+        /// Mensagem de erro
+        message: String 
+    },
 
     /// Erro do protocolo MCP
     #[error("Erro de protocolo MCP: {message}")]
-    McpProtocol { message: String },
+    McpProtocol { 
+        /// Mensagem de erro
+        message: String 
+    },
 
     /// Erro de serialização/deserialização
     #[error("Erro de serialização: {message}")]
-    Serialization { message: String },
+    Serialization { 
+        /// Mensagem de erro
+        message: String 
+    },
 
     /// Erro de bridge Python
     #[cfg(feature = "python-bridge")]
@@ -53,11 +76,21 @@ pub enum SageXError {
 
     /// Erro de timeout
     #[error("Timeout após {seconds}s: {operation}")]
-    Timeout { seconds: u64, operation: String },
+    Timeout { 
+        /// Tempo limite em segundos
+        seconds: u64, 
+        /// Operação que sofreu timeout
+        operation: String 
+    },
 
     /// Erro de validação
     #[error("Erro de validação: {field} - {message}")]
-    Validation { field: String, message: String },
+    Validation { 
+        /// Campo que falhou na validação
+        field: String, 
+        /// Mensagem de erro
+        message: String 
+    },
 
     /// Erro de I/O
     #[error("Erro de I/O: {0}")]
@@ -81,7 +114,10 @@ pub enum SageXError {
 
     /// Erro desconhecido
     #[error("Erro desconhecido: {message}")]
-    Unknown { message: String },
+    Unknown { 
+        /// Mensagem de erro
+        message: String 
+    },
 }
 
 impl SageXError {
