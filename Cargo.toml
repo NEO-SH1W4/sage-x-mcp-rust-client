@@ -1,0 +1,103 @@
+[package]
+name = "sage-x-mcp-rust-client"
+version = "0.1.0"
+edition = "2021"
+authors = ["NEO-SH1W4 <dev@sage-x.ai>"]
+description = "🦀 SAGE-X MCP Rust Client - Cliente Rust moderno para integração com capacidades MCP avançadas"
+repository = "https://github.com/NEO-SH1W4/sage-x-mcp-rust-client"
+license = "MIT"
+keywords = ["sage", "mcp", "rust", "ai", "bridge"]
+categories = ["api-bindings", "development-tools", "wasm"]
+
+[lib]
+name = "sage_x_mcp_client"
+path = "src/lib.rs"
+
+[[bin]]
+name = "sage-x-mcp-demo"
+path = "src/bin/demo.rs"
+
+[dependencies]
+# Async runtime
+tokio = { version = "1.36", features = ["full", "rt-multi-thread", "macros", "time", "fs", "process"] }
+tokio-stream = { version = "0.1", features = ["net", "io-util"] }
+futures = "0.3"
+async-trait = "0.1"
+
+# HTTP client & MCP
+reqwest = { version = "0.11", features = ["json", "stream", "rustls-tls"], default-features = false }
+eventsource-stream = "0.2"
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+# Serialization & Data
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+toml = "0.8"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Utilities
+chrono = { version = "0.4", features = ["serde"] }
+log = "0.4"
+env_logger = "0.10"
+clap = { version = "4.0", features = ["derive"] }
+
+# Cryptography & Security
+sha2 = "0.10"
+base64 = "0.21"
+jsonwebtoken = "9.0"
+
+# MCP Protocol & WARP Integration
+jsonrpc-core = "18.0"
+jsonrpc-http-server = "18.0"
+
+# Configuration
+dotenv = "0.15"
+config = "0.13"
+
+# Optional Python bridge
+pyo3 = { version = "0.20", features = ["auto-initialize"], optional = true }
+
+# WASM support for web integration
+wasm-bindgen = { version = "0.2", optional = true }
+wasm-bindgen-futures = { version = "0.4", optional = true }
+js-sys = { version = "0.3", optional = true }
+
+[dev-dependencies]
+tokio-test = "0.4"
+mockito = "1.2"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[features]
+default = ["mcp-enhanced", "rules-engine"]
+full = ["mcp-enhanced", "rules-engine", "python-bridge", "wasm-support"]
+
+# Core features
+mcp-enhanced = []
+rules-engine = []
+
+# Bridge features  
+python-bridge = ["pyo3"]
+wasm-support = ["wasm-bindgen", "wasm-bindgen-futures", "js-sys"]
+
+# Development features
+dev-tools = ["clap"]
+
+[[bench]]
+name = "mcp_client_bench"
+harness = false
+
+[profile.release]
+lto = true
+opt-level = 3
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+opt-level = 0
+debug = true
+split-debuginfo = "packed"
+
